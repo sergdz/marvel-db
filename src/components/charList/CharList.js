@@ -19,6 +19,7 @@ class CharList extends Component {
     }
 
     componentDidMount() {
+
         this.onCharters()
     }
 
@@ -27,7 +28,7 @@ class CharList extends Component {
         return (
             <div className="char__list">
                 <ul className="char__grid">
-                    <List charList={charList} />
+                    <List onCharSelected={this.props.onCharSelected} charList={charList} />
                 </ul>
                 <button className="button button__main button__long">
                     <div className="inner">load more</div>
@@ -37,9 +38,9 @@ class CharList extends Component {
     }
 }
 
-const List = ({ charList }) => {
+const List = ({ charList, onCharSelected }) => {
     return charList.map(char => (
-        <li key={char.id} className="char__item">
+        <li key={char.id} onClick={() => onCharSelected(char.id)}  className="char__item">
             <img src={char.thumbnail} style={char.thumbnail.indexOf('image_not_available') !== -1 ? { objectFit: 'contain' } : { objectFit: 'cover' }} alt={char.name} />
             <div className="char__name">{char.name}</div>
         </li>

@@ -11,7 +11,7 @@ const Skeleton = () => {
                 </div>
                 <div className="pulse skeleton__block"></div>
                 <div className="pulse skeleton__block"></div>
-                <div className="pulse skeleton__block">1</div>
+                <div className="pulse skeleton__block"></div>
             </div>
         </>
     )
