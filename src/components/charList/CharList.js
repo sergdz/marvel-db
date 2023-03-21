@@ -1,36 +1,75 @@
 import { Component } from 'react';
 import MarvelService from '../../services/MarvelServices';
+import PropTypes from 'prop-types'
 
 import './charList.scss';
 
 class CharList extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            charList: []
-        }
+    state = {
+        charList: [],
+        loading: true,
+        error: false,
+        newItemLoading: false,
+        offset: 1548,
+        charEnded: false
     }
 
     marvelService = new MarvelService();
 
-    onCharters = async () => {
-        const charList = await this.marvelService.getAllCharacters()
-        this.setState({ charList })
+    componentDidMount() {
+        this.onRequest();
     }
 
-    componentDidMount() {
+    onRequest = (offset) => {
+            this.onCharListLoading();
+            this.marvelService.getAllCharacters(offset)
+            .then(this.onCharListLoaded)
+            .catch(this.onError)
+    }
 
-        this.onCharters()
+    onCharListLoading = () => {
+        this.setState({
+            newItemLoading: true
+        })
+    }
+
+    onCharListLoaded = (newCharList) => {
+        let ended = false;
+        if(newCharList.length < 9){
+            ended = true;
+        }
+
+
+        this.setState(({offset, charList}) => ({
+            charList: [...charList, ...newCharList],
+            loading: false,
+            newItemLoading:false,
+            offset: offset + 9,
+            charEnded: ended
+        }))
+    }
+
+    onError = () => {
+        this.setState({
+            error: true,
+            loading: false
+        })
     }
 
     render() {
-        const { charList } = this.state
+        const { charList, offset, newItemLoading, charEnded } = this.state
         return (
             <div className="char__list">
                 <ul className="char__grid">
                     <List onCharSelected={this.props.onCharSelected} charList={charList} />
                 </ul>
-                <button className="button button__main button__long">
+                <button
+
+                 className="button button__main button__long"
+                 disabled={newItemLoading}
+                 style={{'display': charEnded ? 'none' : 'block'}}
+                 onClick={() => this.onRequest(offset)}
+                 >
                     <div className="inner">load more</div>
                 </button>
             </div>
@@ -40,11 +79,14 @@ class CharList extends Component {
 
 const List = ({ charList, onCharSelected }) => {
     return charList.map(char => (
-        <li key={char.id} onClick={() => onCharSelected(char.id)}  className="char__item">
+        <li key={char.id} onClick={() => onCharSelected(char.id)} className="char__item">
             <img src={char.thumbnail} style={char.thumbnail.indexOf('image_not_available') !== -1 ? { objectFit: 'contain' } : { objectFit: 'cover' }} alt={char.name} />
             <div className="char__name">{char.name}</div>
         </li>
     ))
 }
 
+CharList.propTypes = {
+    onCharSelected: PropTypes.func
+}
 export default CharList;
