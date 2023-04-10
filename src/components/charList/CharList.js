@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { Component } from 'react';
 import MarvelService from '../../services/MarvelServices';
 import PropTypes from 'prop-types'
 
@@ -16,13 +16,19 @@ class CharList extends Component {
 
     marvelService = new MarvelService();
 
+
+
+
     componentDidMount() {
         this.onRequest();
+
     }
 
+
+
     onRequest = (offset) => {
-            this.onCharListLoading();
-            this.marvelService.getAllCharacters(offset)
+        this.onCharListLoading();
+        this.marvelService.getAllCharacters(offset)
             .then(this.onCharListLoaded)
             .catch(this.onError)
     }
@@ -35,15 +41,15 @@ class CharList extends Component {
 
     onCharListLoaded = (newCharList) => {
         let ended = false;
-        if(newCharList.length < 9){
+        if (newCharList.length < 9) {
             ended = true;
         }
 
 
-        this.setState(({offset, charList}) => ({
+        this.setState(({ offset, charList }) => ({
             charList: [...charList, ...newCharList],
             loading: false,
-            newItemLoading:false,
+            newItemLoading: false,
             offset: offset + 9,
             charEnded: ended
         }))
@@ -63,13 +69,14 @@ class CharList extends Component {
                 <ul className="char__grid">
                     <List onCharSelected={this.props.onCharSelected} charList={charList} />
                 </ul>
+
                 <button
 
-                 className="button button__main button__long"
-                 disabled={newItemLoading}
-                 style={{'display': charEnded ? 'none' : 'block'}}
-                 onClick={() => this.onRequest(offset)}
-                 >
+                    className="button button__main button__long"
+                    disabled={newItemLoading}
+                    style={{ 'display': charEnded ? 'none' : 'block' }}
+                    onClick={() => this.onRequest(offset)}
+                >
                     <div className="inner">load more</div>
                 </button>
             </div>
@@ -77,13 +84,61 @@ class CharList extends Component {
     }
 }
 
-const List = ({ charList, onCharSelected }) => {
-    return charList.map(char => (
-        <li key={char.id} onClick={() => onCharSelected(char.id)} className="char__item">
-            <img src={char.thumbnail} style={char.thumbnail.indexOf('image_not_available') !== -1 ? { objectFit: 'contain' } : { objectFit: 'cover' }} alt={char.name} />
-            <div className="char__name">{char.name}</div>
-        </li>
-    ))
+class List extends Component {
+    state = {
+        active: null
+    }
+
+    itemsRef = []
+
+    setRef = (item) => {
+        this.itemsRef.push(item)
+    }
+
+    activeChar = (id) => {
+
+        this.itemsRef.forEach(item => item.classList.remove('char__item_selected'))
+        this.itemsRef[id].classList.add('char__item_selected');
+         this.itemsRef[id].focus()
+         console.log(this.itemsRef[id].className);
+    }
+
+
+    render() {
+        const { charList, onCharSelected } = this.props
+        const className = "char__item"
+
+        return charList.map((char, index) => (
+
+
+            <li
+                key={char.id}
+                tabIndex={0}
+
+                className={className}
+                ref={this.setRef}
+                onClick={(e) => {
+                   this.activeChar(index)
+                    onCharSelected(char.id)
+                }}
+
+                keyboardEvent={(e) => {
+                    if (e.key === ' ' || e.key === "Enter") {
+                        this.props.onCharSelected(char.id);
+                        this.activeChar(index);
+                    }
+                }}>
+
+
+                <img src={char.thumbnail} style={char.thumbnail.indexOf('image_not_available') !== -1 ? { objectFit: 'contain' } : { objectFit: 'cover' }} alt={char.name} />
+                <div className="char__name">{char.name}</div>
+            </li>
+        ))
+    }
+
+
+
+
 }
 
 CharList.propTypes = {
