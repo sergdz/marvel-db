@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import './comicsList.scss';
 import useMarvelService from '../../services/MarvelServices';
 import Spinner from '../spinner/Spinner';
@@ -9,14 +10,16 @@ import xMen from '../../resources/img/x-men.png';
 const ComicsList = () => {
 
 
+    const id = useParams()
     const { loading, error, getComicsList} = useMarvelService()
     const [comicsList, setComicsList] = useState([])
     const [limitComics, setLimitComics] = useState(8)
     const [comicsEnd, setComicsEnd] = useState(false)
 
-
+console.log(id);
 
     useEffect(() => {
+
         onRequest(limitComics)
     }, [])
 
@@ -35,16 +38,15 @@ const ComicsList = () => {
         setComicsList(comicsList)
     }
 
-    console.log('comics');
 
-
-    const content = comicsList.map((item, i) => (
-        <li className="comics__item" key={i}>
-            <a href={item.urls}>
+console.log(comicsList);
+    const content = comicsList.map((item) => (
+        <li className="comics__item" key={item.id}>
+            <Link to={`/comics/${item.id}`}>
                 <img src={item.thumbnail} alt={item.title} className="comics__item-img" />
                 <div className="comics__item-name">{item.title}</div>
                 <div className="comics__item-price">{item.price ? `${item.price}$` : 'Цена не указана'}</div>
-            </a>
+            </Link>
         </li>
     ));
 

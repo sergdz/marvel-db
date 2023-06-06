@@ -6,6 +6,7 @@ const ErrorMessage = () => {
             {
                 display: 'block',
                 width: '200px',
+                margin: '0 auto',
                 height: '180px',
                 objectFit: 'cover',
             }

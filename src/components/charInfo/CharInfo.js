@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types'
+import { Link, NavLink, useParams } from 'react-router-dom';
 import useMarvelService from '../../services/MarvelServices';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -69,19 +70,22 @@ const CharInfo = (props) => {
 
 const View = ({ char }) => {
     const { name, thumbnail, homepage, wiki, description, comicsList } = char
-    /*     console.log(comicsList);
-     */
-    const comicsListToShow = comicsList.splice(0, 10)
 
-    const comics = comicsListToShow.map((comic, i) => {
+    const comics = comicsList.map((comic, i) => {
+        const id = comic.resourceURI.slice(43)
         return (
-            <li key={i} className="char__comics-item">
+            <li key={id} className="char__comics-item">
+                <Link to={`/comics/${id}`}>
                 {comic.name}
+                </Link>
+
             </li>
         );
     });
 
     const comicsNull = <li className="char__comics-item"> Комиксы отсутствуют </li>
+
+    console.log('render');
 
     return (
         <>
